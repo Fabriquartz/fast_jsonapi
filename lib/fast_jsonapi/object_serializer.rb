@@ -260,7 +260,7 @@ module FastJsonapi
           transform_method: @transform_method,
           links: options[:links],
           lazy_load_data: options[:lazy_load_data],
-          current_serializer: self.name
+          current_serializer: self
         )
       end
 
