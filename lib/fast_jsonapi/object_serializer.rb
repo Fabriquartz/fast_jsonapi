@@ -259,7 +259,8 @@ module FastJsonapi
           conditional_proc: options[:if],
           transform_method: @transform_method,
           links: options[:links],
-          lazy_load_data: options[:lazy_load_data]
+          lazy_load_data: options[:lazy_load_data],
+          current_serializer: self.name
         )
       end
 
@@ -313,6 +314,10 @@ module FastJsonapi
             klass = relationship_to_include.serializer.to_s.constantize unless relationship_to_include.polymorphic.is_a?(Hash)
           end
         end
+      end
+
+      def custom_record_type_settings(record, serializer, record_type)
+        [record_type, serializer]
       end
     end
   end
