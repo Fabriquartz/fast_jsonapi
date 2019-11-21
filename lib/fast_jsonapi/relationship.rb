@@ -1,6 +1,6 @@
 module FastJsonapi
   class Relationship
-    attr_reader :key, :name, :id_method_name, :record_type, :object_method_name, :object_block, :serializer, :relationship_type, :cached, :polymorphic, :conditional_proc, :transform_method, :links, :lazy_load_data
+    attr_reader :key, :name, :id_method_name, :record_type, :object_method_name, :object_block, :serializer, :relationship_type, :cached, :polymorphic, :conditional_proc, :transform_method, :links, :lazy_load_data, :current_serializer
 
     def initialize(
       key:,
@@ -16,7 +16,8 @@ module FastJsonapi
       conditional_proc:,
       transform_method:,
       links:,
-      lazy_load_data: false
+      lazy_load_data: false,
+      current_serializer:
     )
       @key = key
       @name = name
@@ -32,6 +33,7 @@ module FastJsonapi
       @transform_method = transform_method
       @links = links || {}
       @lazy_load_data = lazy_load_data
+      @current_serializer = current_serializer
     end
 
     def serialize(record, included, serialization_params, output_hash)
@@ -62,6 +64,8 @@ module FastJsonapi
     private
 
     def ids_hash_from_record_and_relationship(record, params = {})
+      resolve_polymorphic_subattribute(record) if record_type.to_s.eql? 'flexible'
+
       return ids_hash(
         fetch_id(record, params)
       ) unless polymorphic
@@ -73,6 +77,10 @@ module FastJsonapi
       end if associated_object.respond_to? :map
 
       id_hash_from_record associated_object, polymorphic
+    end
+
+    def resolve_polymorphic_subattribute(record)
+      record_type, serializer = custom_record_type_settings(record, serializer, record_type)
     end
 
     def id_hash_from_record(record, record_types)
