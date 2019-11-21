@@ -80,7 +80,7 @@ module FastJsonapi
     end
 
     def resolve_polymorphic_subattribute(record)
-      record_type, serializer = custom_record_type_settings(record, serializer, record_type)
+      record_type, serializer = current_serializer.custom_record_type_settings(record, serializer, record_type)
     end
 
     def id_hash_from_record(record, record_types)
